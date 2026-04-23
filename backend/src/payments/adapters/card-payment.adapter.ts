@@ -12,7 +12,8 @@ export class CardPaymentAdapter implements PaymentAdapter {
   private readonly stripeApiUrl = 'https://api.stripe.com/v1';
 
   constructor(private configService: ConfigService) {
-    const isDev = this.configService.get<string>('NODE_ENV') === 'development';
+    const forceMock = String(this.configService.get('FORCE_DEV_PAYMENT_MOCK')).toLowerCase() === 'true';
+    const isDev = this.configService.get<string>('NODE_ENV') === 'development' || forceMock;
     this.stripeSecretKey =
       this.configService.get<string>('STRIPE_SECRET_KEY') ||
       (isDev ? 'sk_test_dev_not_used_mock_payments' : '');

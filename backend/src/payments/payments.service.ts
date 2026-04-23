@@ -21,7 +21,8 @@ export class PaymentsService {
     private cardPaymentAdapter: CardPaymentAdapter,
     private mockPaymentAdapter: MockPaymentAdapter,
   ) {
-    const useMock = this.configService.get('NODE_ENV') === 'development';
+    const forceMock = String(this.configService.get('FORCE_DEV_PAYMENT_MOCK')).toLowerCase() === 'true';
+    const useMock = this.configService.get('NODE_ENV') === 'development' || forceMock;
 
     this.adapters = {
       KBZPAY: useMock ? this.mockPaymentAdapter : this.kbzPayAdapter,

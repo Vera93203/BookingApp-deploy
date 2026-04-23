@@ -15,7 +15,8 @@ export class KbzPayAdapter implements PaymentAdapter {
   private readonly apiSecret: string;
 
   constructor(private configService: ConfigService) {
-    const isDev = this.configService.get<string>('NODE_ENV') === 'development';
+    const forceMock = String(this.configService.get('FORCE_DEV_PAYMENT_MOCK')).toLowerCase() === 'true';
+    const isDev = this.configService.get<string>('NODE_ENV') === 'development' || forceMock;
     const placeholder = isDev ? 'dev-not-used' : '';
 
     this.apiUrl = this.configService.get<string>('KBZPAY_API_URL') || placeholder;

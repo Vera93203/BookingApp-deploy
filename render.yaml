@@ -39,6 +39,8 @@ services:
         value: "true"
       - key: DEV_OTP_CODE
         value: "123456"
+      - key: FORCE_DEV_PAYMENT_MOCK
+        value: "true"
       - key: SENDGRID_API_KEY
         sync: false
       - key: SENDGRID_FROM_EMAIL
