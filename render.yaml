@@ -36,7 +36,7 @@ services:
       - key: TWILIO_VERIFY_SERVICE_SID
         sync: false
       - key: FORCE_DEV_OTP_MOCK
-        value: "true"
+        value: "false"
       - key: DEV_OTP_CODE
         value: "123456"
       - key: FORCE_DEV_PAYMENT_MOCK
