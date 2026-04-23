@@ -10,6 +10,7 @@ import { UploadsService } from './uploads.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { PropertiesService } from '../properties/properties.service';
 import { memoryStorage } from 'multer';
+import type { Express } from 'express';
 
 const multerOptions = {
   storage: memoryStorage(),

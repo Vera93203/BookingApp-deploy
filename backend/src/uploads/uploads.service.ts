@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import type { Express } from 'express';
 
 export interface UploadResult {
   url: string;
