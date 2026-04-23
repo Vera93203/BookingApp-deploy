@@ -1,0 +1,12 @@
+{
+  "name": "myanmar-uclicky",
+  "private": true,
+  "description": "Run npm scripts from repo root; implementation lives in backend/",
+  "scripts": {
+    "db:up": "npm run db:up --prefix backend",
+    "db:down": "npm run db:down --prefix backend",
+    "db:logs": "npm run db:logs --prefix backend",
+    "backend:dev": "npm run start:dev --prefix backend",
+    "backend:build": "npm run build --prefix backend"
+  }
+}

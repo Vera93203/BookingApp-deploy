@@ -1,0 +1,22 @@
+# Local PostgreSQL for development — run from backend/: npm run db:up
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: uclicky
+      POSTGRES_PASSWORD: uclicky_dev_change_me
+      POSTGRES_DB: uclicky
+    # Use 5433 on the host so Homebrew / local Postgres on 5432 does not steal connections
+    ports:
+      - '5433:5432'
+    volumes:
+      - uclicky_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U uclicky -d uclicky']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  uclicky_pgdata:

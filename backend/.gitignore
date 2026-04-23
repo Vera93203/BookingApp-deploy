@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.js
+*.d.ts
+*.js.map
+!nest-cli.json
+!tsconfig.json
+!package.json
+!prisma/

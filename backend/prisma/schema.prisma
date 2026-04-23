@@ -1,0 +1,314 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  USER
+  PARTNER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  PAYMENT_FAILED
+  PAID_PENDING_PARTNER_APPROVAL
+  CONFIRMED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  KBZPAY
+  CARD
+}
+
+enum PropertyStatus {
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum PropertyType {
+  HOTEL
+  ROOM
+  APARTMENT
+  HOSTEL
+  MOTEL
+  BUNGALOW
+}
+
+enum PartnerStatus {
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+// ============================================
+// USER & AUTH
+// ============================================
+
+model User {
+  id            String    @id @default(uuid())
+  phone         String?   @unique
+  email         String?   @unique
+  googleId      String?   @unique @map("google_id")
+  countryCode   String?   @map("country_code")
+  passwordHash  String?   @map("password_hash")
+  role          UserRole  @default(USER)
+  isActive      Boolean   @default(true) @map("is_active")
+  isVerified    Boolean   @default(false) @map("is_verified")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  profile       UserProfile?
+  bookings      Booking[]
+  notifications Notification[]
+  partner       Partner?
+
+  @@map("users")
+}
+
+model UserProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  username    String?  @unique
+  fullName    String?  @map("full_name")
+  avatarUrl   String?  @map("avatar_url")
+  dateOfBirth DateTime? @map("date_of_birth")
+  nationality String?
+  isComplete  Boolean  @default(false) @map("is_complete")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// ============================================
+// PARTNER
+// ============================================
+
+model Partner {
+  id            String        @id @default(uuid())
+  userId        String        @unique @map("user_id")
+  businessName  String        @map("business_name")
+  businessEmail String        @map("business_email")
+  businessPhone String        @map("business_phone")
+  address       String?
+  licenseNumber String?       @map("license_number")
+  status        PartnerStatus @default(PENDING_APPROVAL)
+  approvedAt    DateTime?     @map("approved_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  properties Property[]
+
+  @@map("partners")
+}
+
+// ============================================
+// PROPERTY & ROOMS
+// ============================================
+
+model Property {
+  id            String         @id @default(uuid())
+  partnerId     String         @map("partner_id")
+  name          String
+  description   String?
+  propertyType  PropertyType   @default(HOTEL) @map("property_type")
+  address       String
+  city          String
+  state         String?
+  country       String         @default("Myanmar")
+  latitude      Float?
+  longitude     Float?
+  starRating    Int?           @map("star_rating")
+  amenities     String[]       @default([])
+  images        String[]       @default([])
+  checkInTime   String         @default("14:00") @map("check_in_time")
+  checkOutTime  String         @default("11:00") @map("check_out_time")
+  policies      Json?
+  status        PropertyStatus @default(PENDING_APPROVAL)
+  isActive      Boolean        @default(true) @map("is_active")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  partner    Partner    @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  roomTypes  RoomType[]
+  bookings   Booking[]
+
+  @@index([city])
+  @@index([country])
+  @@index([status])
+  @@map("properties")
+}
+
+model RoomType {
+  id            String   @id @default(uuid())
+  propertyId    String   @map("property_id")
+  name          String
+  description   String?
+  maxGuests     Int      @map("max_guests")
+  bedType       String?  @map("bed_type")
+  roomSize      Float?   @map("room_size")
+  basePrice     Float    @map("base_price")
+  currency      String   @default("MMK")
+  amenities     String[] @default([])
+  images        String[] @default([])
+  totalRooms    Int      @default(1) @map("total_rooms")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  property      Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  availability  Availability[]
+  bookingItems  BookingItem[]
+
+  @@map("room_types")
+}
+
+model Availability {
+  id          String   @id @default(uuid())
+  roomTypeId  String   @map("room_type_id")
+  date        DateTime @db.Date
+  available   Int      @default(1)
+  price       Float?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  roomType RoomType @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([roomTypeId, date])
+  @@index([date])
+  @@map("availability")
+}
+
+// ============================================
+// BOOKING & PAYMENT
+// ============================================
+
+model Booking {
+  id              String        @id @default(uuid())
+  userId          String        @map("user_id")
+  propertyId      String        @map("property_id")
+  checkIn         DateTime      @map("check_in") @db.Date
+  checkOut        DateTime      @map("check_out") @db.Date
+  guestName       String        @map("guest_name")
+  guestEmail      String?       @map("guest_email")
+  guestPhone      String        @map("guest_phone")
+  numberOfGuests  Int           @map("number_of_guests")
+  specialRequests String?       @map("special_requests")
+  totalAmount     Float         @map("total_amount")
+  currency        String        @default("MMK")
+  status          BookingStatus @default(PENDING_PAYMENT)
+  partnerNote     String?       @map("partner_note")
+  confirmedAt     DateTime?     @map("confirmed_at")
+  cancelledAt     DateTime?     @map("cancelled_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  property     Property      @relation(fields: [propertyId], references: [id])
+  bookingItems BookingItem[]
+  payment      Payment?
+  emailLogs    EmailLog[]
+
+  @@index([userId])
+  @@index([propertyId])
+  @@index([status])
+  @@map("bookings")
+}
+
+model BookingItem {
+  id          String   @id @default(uuid())
+  bookingId   String   @map("booking_id")
+  roomTypeId  String   @map("room_type_id")
+  quantity    Int      @default(1)
+  nights      Int
+  pricePerNight Float  @map("price_per_night")
+  subtotal    Float
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  booking  Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  roomType RoomType @relation(fields: [roomTypeId], references: [id])
+
+  @@map("booking_items")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  bookingId         String        @unique @map("booking_id")
+  amount            Float
+  currency          String        @default("MMK")
+  method            PaymentMethod
+  status            PaymentStatus @default(UNPAID)
+  transactionId     String?       @unique @map("transaction_id")
+  providerReference String?       @map("provider_reference")
+  providerResponse  Json?         @map("provider_response")
+  paidAt            DateTime?     @map("paid_at")
+  refundedAt        DateTime?     @map("refunded_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("payments")
+}
+
+// ============================================
+// EMAIL & NOTIFICATIONS
+// ============================================
+
+model EmailLog {
+  id          String   @id @default(uuid())
+  bookingId   String?  @map("booking_id")
+  toEmail     String   @map("to_email")
+  subject     String
+  templateId  String?  @map("template_id")
+  status      String   @default("sent")
+  sentAt      DateTime @default(now()) @map("sent_at")
+  error       String?
+
+  booking Booking? @relation(fields: [bookingId], references: [id])
+
+  @@map("email_logs")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false) @map("is_read")
+  data      Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
