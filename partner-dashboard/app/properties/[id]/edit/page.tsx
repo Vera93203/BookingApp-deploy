@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { normalizeServerUrl, partnerApi, uploadPartnerPropertyImages } from '@/lib/api';
+import { normalizeServerUrl, partnerApi, uploadPartnerPropertyImages } from '../../../../lib/api';
 import toast from 'react-hot-toast';
 import { ArrowLeft, ImagePlus, X, Loader2 } from 'lucide-react';
 

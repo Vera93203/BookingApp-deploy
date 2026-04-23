@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { normalizeServerUrl, partnerApi } from '@/lib/api';
+import { normalizeServerUrl, partnerApi } from '../../lib/api';
 import { Plus, MapPin, Star, Edit } from 'lucide-react';
 
 export default function PropertiesPage() {

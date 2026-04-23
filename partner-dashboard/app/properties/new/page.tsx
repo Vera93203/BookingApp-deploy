@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { partnerApi } from '@/lib/api';
+import { partnerApi } from '../../../lib/api';
 import toast from 'react-hot-toast';
 
 export default function NewPropertyPage() {

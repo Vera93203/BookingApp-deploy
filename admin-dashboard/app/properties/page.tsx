@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { adminApi } from '@/lib/api';
+import { adminApi } from '../../lib/api';
 import toast from 'react-hot-toast';
 import { Check, X, MapPin, Star, Building2 } from 'lucide-react';
 

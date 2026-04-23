@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
-import { authApi } from '@/lib/api';
+import { authApi } from '../../lib/api';
 import { Shield } from 'lucide-react';
 
 export default function AdminLoginPage() {

@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { partnerApi } from '@/lib/api';
+import { partnerApi } from '../../../lib/api';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Check, X, User, Phone, Mail, Calendar, BedDouble, CreditCard } from 'lucide-react';
 

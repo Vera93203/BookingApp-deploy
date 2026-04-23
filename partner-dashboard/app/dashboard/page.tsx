@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { partnerApi } from '@/lib/api';
+import { partnerApi } from '../../lib/api';
 import { Building2, BedDouble, CalendarCheck, Clock } from 'lucide-react';
 import Link from 'next/link';
 

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { adminApi } from '@/lib/api';
+import { adminApi } from '../../lib/api';
 import { ChevronLeft, ChevronRight, Calendar, CreditCard } from 'lucide-react';
 
 export default function AdminBookingsPage() {

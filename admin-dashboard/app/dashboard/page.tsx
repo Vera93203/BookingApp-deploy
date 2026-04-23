@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { adminApi } from '@/lib/api';
+import { adminApi } from '../../lib/api';
 import { Users, Building2, CalendarCheck, UserPlus, TrendingUp, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 

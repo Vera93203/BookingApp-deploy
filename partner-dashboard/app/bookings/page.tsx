@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { partnerApi } from '@/lib/api';
+import { partnerApi } from '../../lib/api';
 import toast from 'react-hot-toast';
 import { Check, X, Eye, Filter } from 'lucide-react';
 import Link from 'next/link';
